@@ -1,0 +1,129 @@
+-Csatlakoztass a Home_Router alhálózatában lévő eszközöket megfelelő kábellel egymáshoz. 
+Kösse össze a Home_Router-t és a Kábel modem-et. 
+A Home_PC-t csatlakoztassa a Home_Router 1-es portjába. 
+A Home_Server-t csatlakoztassa a Home_Router 2-es portjába. 
+A Home_IPPhone-t csatlakoztassa a Home_Router 3-as portjába. 
+A Home_Laptop-ban cserélje ki a NIC-et WPC300N Wifi-s kártyára.
+
+*kabelek : 	cable-modem-pt (szaggatott kabel) HomeRouter Port1 - Internet
+		PC - HomeRouter  : Fekete kabel - FastEthernet0 - GigabitE 1
+		Server - HomeRouter : fekete k. - FastE. 0 - GigabitE 2
+		Home-Phone - Home Router : fekete k. - Switch - GigabitE3
+*HomeLaptop: Klikk - Physical - wifi modul 
+
+
+-A Home_PC-n kérjen IP címet a DHCP szolgáltatótol. Az alapértelmezett átjáró a Home_Router IP címe, 
+böngésző programmal csatlakozzon az eszközhöz, a felhasználó név és a jelszó alapértemezett (admin, admin) 
+
+*HomePC KLikk - Desktop - IP Configuration - DHCP
+*Desktop - Web Browser - IP cím beíársa - csatlakozás a Routerhez
+
+-Engedélyezze a Home_Routeren az ISP Vlan-ok használatát, a 3-as portot rendelje a 20-as (Voip) Vlan-hoz.
+
+* Router - Setup - DHCP Server Settings - ISP Vlans(Enabled) - PortVlans - Port3-nal Voip kiválasztás
+Save Settings Forward gomb
+
+-A Home_PC-ről pingelje meg a 70.70.70.10-es IP címet. A pingnek sikeresnek kell lennie!
+*Újra adni DHCP-t a PC-nek - ( Static - DHCP ) - forward
+PC - Desktop - CommandPrompt !!! ha nemm egy forward és megnézni van-e DNS Server a géphez
+
+-Állítsa át a forgalomirányító belépési jelszavát „Almafa12”-re. 
+*Routerbe belépni - Administration - Managemnet - Router password - save settings
+
+-A helyi hálózat a 192.168.90.0/26-os tartományban működjön. 
+A Home_Router kapja a hálózat első kioszható IP címét.
+Konfigurálja a Home_Router DHCP szolgáltatását, az első kiosztható IP a hálózat 10. IP címe legyen. 
+A DHCP-re maximum 50 db eszköz legyen csatlakoztatható.
+
+*Router - Setup - Network Setup - Router IP - IP address: IP megadása; Subnet Mask : Helyes mask megadasa.
+*DHCP Server Settings - Enabled; Start IP megadása> IP Range megadása
+
+-A Home_PC-ről pingelje meg a 70.70.70.10-es IP címet. A pingnek sikeresnek kell lennie! 
+Nyissa meg a Home_PC-ről böngészővel az isp.hu-t. A weboldalnak sikeresen meg kell nyílnia! 
+
+*Újra adni DHCP-t a PC-nek - ( Static - DHCP ) - forward
+PC - Desktop - CommandPrompt !!! ha nemm egy forward és megnézni van-e DNS Server a géphez
+Web browseren - isp.hu
+
+-A Home_Server DHCP-vel kapjon IP címet, de mindig ugyanazt a 192.168.90.38-t. Vegyen fel számára fenntartást "Server" néven a DHCP szerveren. 
+
+*Server mac címéhez hozzá kell rednelni a kívánt IP címet
+-Server gépbe belépni - Desktop - Cpmfoguration - DHCP ip-t kerni - IPv4 Megjegyzés!!!
+-Belépni a Routerba a PC-n keresztül - Setup - Network Setup - DHCP Server Settings - DHCP Reservation
+Manually adding client - Server - IP cím(feladatalapján) - Server Mac címe - add - save settings
+
+-A Home_Server-en Web szolgáltatást üzemeltet, készítsen port továbbítást a Home_Routeren a TCP, 80-as portra. 
+*?????
+
+-A 5 GHz-es Wifi hálózatokat tiltsa le, a 2,4 GHz-es hálózat SSID-je legyen Home, a hitelesítés WPA2 Personal, AES titkosítással, a jelszó „Almafa12”. 
+*Router - Basic wireless setting - Disapble 5Ghz -2 és 5Ghz - 1
+2.4Ghz - Network Name: elnevezése
+Wireless Security : Security mode kivalasztasa (legerosebb - WPA2 Pesonal SAVE SETTINGS!
+
+-A Home_Tablet-en és a Home_Laptop-on konfigurálja a vezetéknélküli hálózat beállításait. 
+Wi-Fi beallitas a 2 eszkozon
+
+-A Home_Router fix IP címmel csatlakozzon az Internetszolgáltatóhoz, ez legyen a 193.41.10.26/24, 
+alapértelmezett átjáró 193.41.10.1, dns szerver 70.70.70.10. Konfigurálja ezeket a beállításokat! 
+
+Router - Setup - Internet Setup - Értékek megadása! - Save Settings
+
+-A Home_PC-ről pingelje meg a 70.70.70.10-es IP címet. A pingnek sikeresnek kell lennie. 
+
+Pingelés a korábbi alapján
+
+-Csatlakozzon az ISP routerhez (193.41.10.1)  a Home_PC-ről Telnet-el vagy SSH-val, 
+felhasználó név és jelszó: admin, és készítsen User_Voip néven DHCP-t a Voip-os eszközök számára. 
+A hálózat legyen a 193.41.20.0/24, melynek az első 20 IP címét zárja ki a terjesztésből. 
+Alapértelmezett átjáró legyen a 193.41.20.1, dns szerver a 70.70.70.10, domain név isp.hu, telefonközpont ip címe (option 150) 70.70.80.20. 
+
+*Home PC - Desktop - Telnet/SSH - IP cím megadása, Username magadása - connect
+ 
+ISP#en
+ISP#conf t
+ISP(config)#ip dhcp excluded-address (tol-ig ip cim) 193.41.20.1 193.41.20.20
+
+ISP(config)#ip dhcp pool User_Voip
+ISP(dhcp-config)#network 193.41.20.0 255.255.255.0  (alaphálózat id, subnet mask)
+ISP(dhcp-config)#default-router 193.41.20.1
+ISP(dhcp-config)#dns-server 70.70.70.10
+
+ISP(dhcp-config)#domain-name isp.hu
+ISP(dhcp-config)#option 150 ip 70.70.80.20
+ISP(dhcp-config)exit
+ISP(dhcp-config)service dhcp
+ISP(config)#do w  
+
+-Csatlakozzon a CMS router-hez (70.70.80.20) az ISP router-ről Telnet-el VTY jelszó  „VTYtitok”, a privilegizált mód jelszava  „enaTitok”.
+Konfigurálja a nap üzenetét  „Illetekteleneknek a belepes tilos!”.
+Konfiguráljon alapértelmezett utat a CMS forgalomirányítón cél címként a 70.70.80.1-es IP címet megadva.
+
+*-!! Ott kell maradni!!
+
+ISP(config)#exit
+ISP#telnet 70.70.80.20
+csinál valamit... - password megadás
+
+CMS>en
+password
+CMS#conf t
+CMS(config)#banner motd #Illetekteleneknek a belepes tilos!#
+CMS(config)#ip route 0.0.0.0 0.0.0.0 70.70.80.1
+
+-Vegyen fel felhasználót a CMS-re 15-ös jogosultsági szinttel, felhasználó név és jelszó legyen  „admin”.
+Állítsa a domain nevet  „isp.hu”-ra. 
+Készítsen 1024 bites RSA kulcsot.
+Állítsa be, hogy a forgalomirányító távoli bejelentkezéskor a helyi adatbázis szerint végezze el a hitelesítést és ez csak SSH protokollal történhessen meg.
+
+*CMS(config)#ip domain-name isp.hu
+CMS(config)#crypto key geenrate rsa
+MINDENFÉLE SZÖVEG...
+valami szoveg 512: 1024-et kell beirni
+
+CMS(config)#username admin privilege 15 secret admin
+CMS(config)#line vty 0 15
+CMS(config-line)#login local
+CMS(config-line)#transport input ssh
+CMS(config-line)#
+
+
